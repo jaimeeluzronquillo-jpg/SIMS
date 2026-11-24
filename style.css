@@ -1730,3 +1730,221 @@ html body .sidebar .settings-button[aria-current="page"] {
 #library-integration-title + dl {
   margin-bottom: 1rem;
 }
+/* Settings: four equal cards across the desktop layout */
+#settings:not([hidden]) {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 1.25rem;
+}
+
+#settings > .page-header {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+/* Let each card sit directly in the four-column layout. */
+#settings .settings-grid,
+#settings .settings-column {
+  display: contents;
+}
+
+#settings .settings-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  padding: clamp(1rem, 1.5vw, 1.5rem);
+}
+
+#settings .settings-card h2 {
+  margin: 0 0 1rem;
+  font-size: 1.125rem;
+}
+
+#settings .settings-card dl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.25rem;
+}
+
+#settings .settings-card dd {
+  margin: 0 0 0.65rem;
+  overflow-wrap: anywhere;
+}
+
+#settings #display-settings-form {
+  flex: 1;
+}
+
+#settings #display-settings-form .actions {
+  align-self: end;
+}
+
+#settings #library-integration-title :is(a, button) {
+  max-width: 100%;
+  white-space: normal;
+  text-align: left;
+}
+
+#settings-title[tabindex="-1"]:focus {
+  outline: none;
+}
+
+@media (max-width: 1350px) {
+  #settings:not([hidden]) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  #settings:not([hidden]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+#settings:not([hidden]) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#settings-account .actions {
+  justify-content: flex-start;
+}
+
+@media (max-width: 1100px) {
+  #settings:not([hidden]) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  #settings:not([hidden]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* Clearance Activity page */
+main:has(> #library-activity:not([hidden])),
+#library-activity {
+  min-width: 0;
+}
+
+#library-activity .page-header {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding: clamp(1rem, 3vw, 1.6rem);
+  border: 1px solid #d3dfe7;
+  border-radius: 1rem;
+  background: linear-gradient(120deg, #fffdf8, #e9eff3);
+}
+
+#library-activity .page-header h1 {
+  margin: 0;
+  font-size: clamp(1.65rem, 3vw, 2.5rem);
+}
+
+#library-activity #clearance-history {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #d3dfe7;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+#library-activity .table-scroll {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  border: 0;
+  border-radius: 0;
+}
+
+#library-activity table {
+  width: 100%;
+  min-width: 38rem;
+  table-layout: fixed;
+}
+
+#library-activity :is(th, td) {
+  padding: 0.9rem 1rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#library-activity th {
+  background: #e8eff4;
+  color: #21334b;
+}
+
+#library-activity #clearance-history-status:not([hidden]) {
+  order: 1;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid #dde6ed;
+  color: #435b70;
+}
+
+#library-activity #clearance-history:not(:has(tbody tr))
+  #clearance-history-status:not([hidden]) {
+  display: grid;
+  place-items: center;
+  min-height: 9rem;
+  padding: 1.5rem 1rem;
+  background: #f8fafc;
+  color: #21334b;
+  font-size: 1.125rem;
+  font-weight: 650;
+  text-align: center;
+}
+
+#sign-in .privacy-agreement-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+#sign-in .privacy-agreement-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#sign-in .privacy-agreement-row label #privacy-agreement {
+  width: 1rem;
+  height: 1rem;
+  min-height: 0;
+  margin: 0;
+  accent-color: #43647c;
+}
+
+#sign-in #privacy-agreement[aria-invalid="true"] {
+  outline: 2px solid #b42336;
+  outline-offset: 2px;
+}
+
+#sign-in .privacy-agreement-row .privacy-policy-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #294e70;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+#sign-in .privacy-agreement-row .privacy-policy-link:hover {
+  color: #173353;
+  background: transparent;
+  box-shadow: none;
+  filter: none;
+}
+
+#privacy-policy-dialog .privacy-policy-copy {
+  display: grid;
+  gap: 0.85rem;
+}

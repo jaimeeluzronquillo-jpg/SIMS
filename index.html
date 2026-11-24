@@ -61,6 +61,18 @@
             Password
             <input name="password" type="password" autocomplete="current-password" required>
           </label>
+          <div class="privacy-agreement-row">
+            <label for="privacy-agreement">
+              <input id="privacy-agreement" name="privacyAgreement" type="checkbox"
+                     aria-describedby="privacy-agreement-error" required>
+              I agree to the
+            </label>
+            <button type="button" id="open-privacy-policy" class="privacy-policy-link"
+                    aria-haspopup="dialog" aria-controls="privacy-policy-dialog">
+              Data Privacy Policy
+            </button>
+          </div>
+          <p id="privacy-agreement-error" class="error" role="alert" hidden></p>
           <p id="auth-error" class="error" role="alert" hidden></p>
           <div class="actions">
             <button type="submit">Sign in</button>
@@ -171,27 +183,20 @@
       <div class="settings-grid">
         <div class="settings-column">
           <section class="settings-card" id="settings-account" aria-labelledby="account-title" hidden>
-            <h2 id="account-title">My Account</h2>
+            <h2 id="account-title">Account Management</h2>
             <dl>
               <dt>Email</dt><dd id="settings-email"></dd>
-              <dt>Role</dt><dd>Admin</dd>
+              
             </dl>
+            <div class="actions"><button type="button" id="change-password" class="secondary">Change password</button></div>
           </section>
-          <section class="settings-card" id="settings-security" aria-labelledby="security-title" hidden>
-            <h2 id="security-title">Security</h2>
-            <button type="button" id="change-password" class="secondary">Change password</button>
-          </section>
+
         </div>
         <div class="settings-column">
           <section class="settings-card" aria-labelledby="preferences-title">
-            <h2 id="preferences-title">Display preferences</h2>
+            <h2 id="preferences-title">Appearance</h2>
             <form id="display-settings-form">
-              <label>Clock format
-                <select name="clockFormat">
-                  <option value="12">12-hour</option>
-                  <option value="24">24-hour</option>
-                </select>
-              </label>
+              
               <label class="motion-option">
                 <input name="motion" type="checkbox">
                 Animate sign-in background
@@ -201,7 +206,7 @@
             </form>
           </section>
           <section class="settings-card" aria-labelledby="library-integration-title" hidden>
-            <h2 id="library-integration-title">Library Integration</h2>
+            <h2 id="library-integration-title"><a class="button secondary" href="#library-activity">Library Integration</a></h2>
             <dl>
               <dt>Latest clearance update</dt>
               <dd id="library-last-update">No clearance updates yet.</dd>
@@ -211,9 +216,34 @@
               Notify me when clearance changes
             </label>
             <p id="clearance-preference-message" role="status" hidden></p>
+            
           </section>
         </div>
       </div>
+    </section>
+    <section id="library-activity" aria-labelledby="library-activity-title" hidden>
+      <header class="page-header">
+        <h1 id="library-activity-title">Clearance Activity</h1>
+        <a class="button secondary" href="#settings">Back to Settings</a>
+      </header>
+      <div id="clearance-history" class="table-card">
+              
+              <p id="clearance-history-status" role="status"></p>
+              <div class="table-scroll">
+                <table aria-label="Clearance activity">
+                  <thead>
+                    <tr>
+                      <th scope="col">Student number</th>
+                      <th scope="col">Previous status</th>
+                      <th scope="col">New status</th>
+                      <th scope="col">Date and time</th>
+                      <th scope="col">Source</th>
+                    </tr>
+                  </thead>
+                  <tbody id="clearance-history-rows"></tbody>
+                </table>
+              </div>
+            </div>
     </section>
   </main>
 
@@ -326,6 +356,26 @@
       <h2 id="student-confirmation-title">Success</h2>
       <p id="student-confirmation-text"></p>
       <div class="actions"><button type="submit" autofocus>OK</button></div>
+    </form>
+  </dialog>
+  <dialog id="privacy-policy-dialog" aria-labelledby="privacy-policy-title">
+    <form method="dialog">
+      <h2 id="privacy-policy-title">Data Privacy Policy</h2>
+      <div class="privacy-policy-copy">
+        <p>The Sinag University Student Information Management System processes
+          student information to manage records, monitor enrollment, and display
+          library clearance.</p>
+        <p>Student records include the student number, name, course, year level,
+          contact number, and enrollment status. Access to student records is
+          restricted to authorized SIMS users.</p>
+        <p>The Library System uses the student number to verify a student and
+          sends clearance decisions to SIMS.</p>
+        <p>For questions about your information or to request a correction,
+          contact the school office responsible for student records.</p>
+      </div>
+      <div class="actions">
+        <button type="submit" autofocus>Close</button>
+      </div>
     </form>
   </dialog>
 </body>

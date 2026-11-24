@@ -6,7 +6,7 @@ const cloudMode = Boolean(config.supabaseUrl || config.supabasePublishableKey);
 const storageKey = "sims-demo-v1";
 const form = byId("student-form");
 const authForm = byId("sign-in-form");
-const pages = ["dashboard", "students", "clearance", "settings"];
+const pages = ["dashboard", "students", "clearance", "settings", "library-activity"];
 const enrollmentStatuses = ["Enrolled", "Not Enrolled"];
 const clearanceStatuses = ["Pending", "Cleared", "Not Cleared"];
 const fields = [
@@ -111,10 +111,10 @@ function showPage() {
   }
 
   message("notice", storageError);
+  if (page === "library-activity" && canView) loadClearanceHistory();
   if (page === "settings" && canView) {
     byId("settings-email").textContent = staff?.email ?? "";
     byId("settings-account").hidden = !staff?.email;
-    byId("settings-security").hidden = !staff?.email;
     byId("library-integration-title").closest("section").hidden = !cloudMode || !staff;
   }
 }
@@ -177,9 +177,63 @@ clearanceToggle.addEventListener("change", () => {
   }
 });
 
+let historyRequest = 0;
+
+async function loadClearanceHistory() {
+  if (!cloud || !staff) {
+    message("clearance-history-status", "Sign in to view clearance activity.");
+    return;
+  }
+
+  const request = ++historyRequest;
+  const session = staff;
+  const rows = byId("clearance-history-rows");
+  rows.replaceChildren();
+  message("clearance-history-status", "Loading clearance activity...");
+
+  try {
+    const { data, error } = await cloud.client.from("clearance_activity")
+      .select("student_number,previous_status,new_status,changed_at,source")
+      .order("id", { ascending: false })
+      .limit(50);
+
+    if (request !== historyRequest || staff !== session ||
+        location.hash !== "#library-activity") return;
+    if (error) throw error;
+
+    rows.replaceChildren(...data.map((entry) => {
+      const row = document.createElement("tr");
+      const values = [
+        entry.student_number,
+        entry.previous_status,
+        entry.new_status,
+        clearanceTimestamp.format(new Date(entry.changed_at)) + " PHT",
+        entry.source,
+      ];
+      for (const value of values) row.insertCell().textContent = value;
+      return row;
+    }));
+
+    message("clearance-history-status", data.length
+      ? `Showing ${data.length} recent clearance changes.`
+      : "No clearance changes recorded yet.");
+  } catch {
+    if (request === historyRequest && staff === session &&
+        location.hash === "#library-activity") {
+      message("clearance-history-status", "Could not load activity. Go back to Settings and reopen Library Integration.");
+    }
+  }
+}
+
+
 function updateLibraryIntegration(students) {
   if (!cloudMode || !staff) {
     previousClearances = null;
+    historyRequest += 1;
+
+
+    byId("clearance-history-rows").replaceChildren();
+    message("clearance-history-status", "");
     message("clearance-alert", "");
     return;
   }
@@ -754,12 +808,10 @@ for (const button of document.querySelectorAll("[data-close]")) {
     year: "numeric",
   });
 
-  let use24Hour = false;
   let motionEnabled = true;
 
   try {
     const saved = JSON.parse(localStorage.getItem(settingsKey) || "{}");
-    use24Hour = saved?.use24Hour === true;
     motionEnabled = saved?.motionEnabled !== false;
   } catch {
     // Use the default settings if browser storage is unavailable.
@@ -771,7 +823,7 @@ for (const button of document.querySelectorAll("[data-close]")) {
     const now = new Date();
     clock.dateTime = now.toISOString();
     clock.textContent =
-      `${dateFormatter.format(now)} · ${timeFormatter.format(now)} PHT`;
+      `${dateFormatter.format(now)} · ${timeFormatter.format(now)}`;
   }
 
   function applySettings() {
@@ -780,7 +832,7 @@ for (const button of document.querySelectorAll("[data-close]")) {
       hour: "numeric",
       minute: "2-digit",
       second: "2-digit",
-      hour12: !use24Hour,
+      hour12: true,
     });
 
     document.documentElement.dataset.sinagMotion =
@@ -790,23 +842,20 @@ for (const button of document.querySelectorAll("[data-close]")) {
   }
 
   const settingsForm = byId("display-settings-form");
-  const clockFormat = settingsForm.elements.namedItem("clockFormat");
   const motion = settingsForm.elements.namedItem("motion");
   const settingsMessage = byId("settings-message");
 
-  clockFormat.value = use24Hour ? "24" : "12";
   motion.checked = motionEnabled;
 
   settingsForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    use24Hour = clockFormat.value === "24";
     motionEnabled = motion.checked;
     applySettings();
 
     try {
       localStorage.setItem(
         settingsKey,
-        JSON.stringify({ use24Hour, motionEnabled })
+        JSON.stringify({ motionEnabled })
       );
       message("settings-message", "Display preferences saved.");
     } catch {
@@ -1162,4 +1211,37 @@ if (cloudMode) {
   records = loadDemo();
   showPage();
   render();
+}
+
+
+// Data privacy acknowledgement on sign-in.
+{
+  const login = document.getElementById("sign-in-form");
+  const agreement = document.getElementById("privacy-agreement");
+  const error = document.getElementById("privacy-agreement-error");
+  const policy = document.getElementById("privacy-policy-dialog");
+
+  document.getElementById("open-privacy-policy").addEventListener("click", () => {
+    policy.showModal();
+  });
+
+  function clearPrivacyError() {
+    agreement.removeAttribute("aria-invalid");
+    error.textContent = "";
+    error.hidden = true;
+  }
+
+  agreement.addEventListener("change", clearPrivacyError);
+  login.addEventListener("reset", clearPrivacyError);
+
+  login.addEventListener("submit", (event) => {
+    if (agreement.checked) return;
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    agreement.setAttribute("aria-invalid", "true");
+    error.textContent = "Agree to the Data Privacy Policy before signing in.";
+    error.hidden = false;
+    agreement.focus();
+  }, true);
 }
